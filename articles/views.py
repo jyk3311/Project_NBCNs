@@ -2,13 +2,21 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListCreateAPIView
 from .models import Article
 from .serializers import ArticleSerializer
 from .validators import validate_create
 
 
-class ArticleListCreateAPIView(APIView):
+class ArticleListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    pagination_class = PageNumberPagination
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.all().order_by("-pk")
 
     def post(self, request):
         is_valid, error_message = validate_create(request.data)
