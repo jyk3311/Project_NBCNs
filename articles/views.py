@@ -56,3 +56,12 @@ class ArticleDetailAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def delete(self, request, pk):
+        article = self.get_object(pk)
+        if article.author == request.user:
+            article.delete()
+            data = f"{pk}번 게시물 삭제"
+            return Response(data)
+        else:
+            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
