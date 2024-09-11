@@ -44,3 +44,15 @@ class ArticleDetailAPIView(APIView):
         article = self.get_object(pk)
         serializer = ArticleDetailSerializer(article)
         return Response(serializer.data)
+
+    def put(self, request, pk):
+        article = self.get_object(pk)
+        if article.author == request.user:
+            serializer = ArticleDetailSerializer(
+                article, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
