@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config.SECRET_KEY
 OPENAI_API_KEY = config.OPENAI_API_KEY
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
