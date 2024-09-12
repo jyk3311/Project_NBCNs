@@ -10,7 +10,7 @@ get_queryset 메소드를 오버라이딩함.
 
 class ArticleManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_authenticated=True)
+        return super().get_queryset().filter(is_mine=True)
 
 
 class Article(models.Model):
@@ -22,7 +22,7 @@ class Article(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=7, choices=category_choices)
-    is_authenticated = models.BooleanField(default=True)
+    is_mine = models.BooleanField(default=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
@@ -34,5 +34,5 @@ class Article(models.Model):
         return self.title
 
     def soft_delete(self):
-        self.is_authenticated = False
+        self.is_mine = False
         self.save()

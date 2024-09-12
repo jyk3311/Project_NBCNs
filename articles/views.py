@@ -23,6 +23,11 @@ class ArticleListCreateAPIView(ListCreateAPIView):
         is_valid, error_message = validate_create(request.data)
         if not is_valid:
             return Response(f"{error_message}", status=status.HTTP_400_BAD_REQUEST)
+
+        if not request.user.is_superuser and (request.data.get("category") == "Company" and not request.user.is_master):
+            return Response({"error_message": "Company 글은 Master만 작성할 수 있습니다."},
+                            status=status.HTTP_403_FORBIDDEN)
+
         article = Article.objects.create(
             title=request.data.get("title"),
             content=request.data.get("content"),
