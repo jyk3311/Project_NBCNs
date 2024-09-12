@@ -6,19 +6,22 @@ moels.Manager의 get_queryset 메소드를 호출하여 데이터를 조회할 �
 is_authenticated가 True인 객체만을 조회하도록 
 get_queryset 메소드를 오버라이딩함.
 """
+
+
 class ArticleManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_authenticated=True)
 
 
 class Article(models.Model):
-    category_choices = [("Free", "자유 게시판"), ("Ask", "질문 게시판")]
+    category_choices = [("Free", "자유 게시판"),
+                        ("Ask", "질문 게시판"), ("Company", "홍보 게시판")]
 
     title = models.CharField(max_length=50)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    category = models.CharField(max_length=4, choices=category_choices)
+    category = models.CharField(max_length=7, choices=category_choices)
     is_authenticated = models.BooleanField(default=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE

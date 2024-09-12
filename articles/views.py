@@ -81,3 +81,11 @@ class AskArticleListAPIView(ListAPIView):
 
     def get_queryset(self):
         return Article.objects.filter(category='Ask').order_by('-pk')
+
+
+class CompanyArticleListAPIView(ListAPIView):
+    pagination_class = PageNumberPagination
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.filter(category='Company').order_by('-pk')
