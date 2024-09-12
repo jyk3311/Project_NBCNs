@@ -113,8 +113,7 @@ class CommentListCreateAPIView(APIView):
         # 특정 게시글을 가져오고 request.data 직렬화
         article = Article.objects.get(pk=pk)
         serializer = CommentSerializer(data=request.data)
-        # 유효성 검사
-        if serializer.is_valid():
+        if serializer.is_valid():  # 유효성 검사
             serializer.save(user=request.user, article=article)  # 작성자와 게시글을 저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
