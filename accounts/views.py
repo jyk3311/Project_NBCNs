@@ -1,11 +1,10 @@
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import UserSerializer
 from rest_framework_simplejwt.exceptions import TokenError
 from .models import User
 from .validators import validate_signup, validate_profile
@@ -20,13 +19,13 @@ class AccountsView(APIView):
         # validations(username, password, email)
         is_valid, err_msg = validate_signup(user_obj, request.data)
         if not is_valid:
-            return Response({"error":err_msg}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": err_msg}, status=status.HTTP_400_BAD_REQUEST)
 
         # user 생성
         user = User.objects.create_user(
-            username = request.data.get("username"),
-            password = request.data.get("password"),
-            email = request.data.get("email"),
+            username=request.data.get("username"),
+            password=request.data.get("password"),
+            email=request.data.get("email"),
         )
 
         serializer = UserSerializer(user)
@@ -40,7 +39,7 @@ class AccountsView(APIView):
         }
 
         return Response(res_data, status=status.HTTP_201_CREATED)
-    
+
     # 회원탈퇴(user 비활성화 처리)
     def delete(self, request):
         user = request.user
@@ -72,7 +71,7 @@ class LoginView(APIView):
             return Response(
                 {"error": "패스워드가 틀렸습니다."}, status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         serializer = UserSerializer(user)
         res_data = serializer.data
 
@@ -83,7 +82,7 @@ class LoginView(APIView):
             "refresh_token": str(refresh)
         }
         return Response(res_data, status=status.HTTP_200_OK)
-    
+
 
 # 로그아웃
 class LogoutView(APIView):
@@ -92,13 +91,13 @@ class LogoutView(APIView):
         try:
             refresh_token = RefreshToken(refresh_token_str)
         except TokenError:
-            return Response({"error":"해당 토큰은 사용할 수 없습니다."},
+            return Response({"error": "해당 토큰은 사용할 수 없습니다."},
                             status=status.HTTP_400_BAD_REQUEST)
-        
+
         refresh_token.blacklist()
-        return Response({"success":"로그아웃 되었습니다."},
-                            status=status.HTTP_200_OK)
-    
+        return Response({"success": "로그아웃 되었습니다."},
+                        status=status.HTTP_200_OK)
+
 
 # 프로필 조회, 회원정보 수정, 비밀번호 변경
 class UpdateProfileView(APIView):
@@ -111,7 +110,7 @@ class UpdateProfileView(APIView):
                             status=status.HTTP_404_NOT_FOUND)
         serializer = UserSerializer(user)
         return Response(serializer.data)
-    
+
     # 회원정보 수정(비밀번호 or 이메일 변경)
     def put(self, request, username):
         user_obj = request.user
@@ -127,11 +126,11 @@ class UpdateProfileView(APIView):
         if user != request.user:
             return Response({"message": "수정 권한이 없습니다."},
                             status=status.HTTP_403_FORBIDDEN)
-        
+
         # 회원정보 유효성 검사
         is_valid, msg = validate_profile(user_obj, request.data)
         if not is_valid:
-            return Response({"error":msg}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": msg}, status=status.HTTP_400_BAD_REQUEST)
 
         # 비밀번호가 유효하다면 비밀번호 설정 및 저장
         new_password = request.data.get("new_password")
@@ -140,6 +139,6 @@ class UpdateProfileView(APIView):
 
         # 변경 사항 저장
         user.save()
-        
+
         # 성공 메시지 반환
         return Response({"success": msg}, status=status.HTTP_200_OK)
