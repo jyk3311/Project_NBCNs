@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from .models import Product
 
 
 class Article(models.Model):
@@ -12,15 +11,14 @@ class Article(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     category = models.CharField(max_length=4, choices=category_choices)
     is_authenticated = models.BooleanField(default=True)
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
 # Comment Model
 class Comment(models.Model):
-    comment_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_comments")
-    comment_product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_comments")
-    content = models.CharField(max_length=100)
+    content = models.TextField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # 댓글을 작성한 사용자를 참조
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)  # 댓글이 달린 기사를 참조
+    is_mine = models.BooleanField(default=True)  # 댓글을 작성한 사용자가 인증된 사용자임을 나타냄
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
