@@ -6,5 +6,3 @@ urlpatterns = [
     path('<int:pk>/', NBCNDetailAPIView.as_view()),
     path('<int:pk>/bookmark/', NBCNBookmarkAPIView.as_view()),
 ]
-
-#

@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import NBCNSerializer
 
-
 # 사용자 권한을 정의하는 클래스
 class IsSuperuserForWriteOperations(BasePermission):
     def has_permission(self, request, view):
