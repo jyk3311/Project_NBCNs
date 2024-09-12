@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
 from rest_framework import status
@@ -8,7 +10,6 @@ from rest_framework_simplejwt.exceptions import TokenError
 from .models import User
 from .validators import validate_signup, validate_profile
 from .serializers import UserSerializer
-
 
 # 회원가입 및 회원탈퇴
 class AccountsView(APIView):
@@ -101,6 +102,7 @@ class LogoutView(APIView):
 
 # 프로필 조회, 회원정보 수정, 비밀번호 변경
 class UpdateProfileView(APIView):
+    # 프로필 조회
     def get(self, request, username):
         try:
             user = User.objects.get(username=username)
@@ -110,27 +112,34 @@ class UpdateProfileView(APIView):
         serializer = UserSerializer(user)
         return Response(serializer.data)
     
-
+    # 회원정보 수정(비밀번호 or 이메일 변경)
     def put(self, request, username):
         user_obj = request.user
 
+        # 사용자가 존재하는지 확인
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response({"error": "사용자를 찾을 수 없습니다."},
                             status=status.HTTP_404_NOT_FOUND)
 
-        # 본인 회원정보만 수정할 수 있음
+        # 본인 회원정보만 수정할 수 있도록 체크
         if user != request.user:
             return Response({"message": "수정 권한이 없습니다."},
                             status=status.HTTP_403_FORBIDDEN)
         
-        # validations(username, password, email)
-        is_valid, err_msg = validate_profile(user_obj, request.data)
+        # 회원정보 유효성 검사
+        is_valid, msg = validate_profile(user_obj, request.data)
         if not is_valid:
-            return Response({"error":err_msg}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error":msg}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 비밀번호가 유효하다면 비밀번호 설정 및 저장
+        new_password = request.data.get("new_password")
+        if new_password:
+            user.set_password(new_password)
+
+        # 변경 사항 저장
+        user.save()
         
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        # 성공 메시지 반환
+        return Response({"success": msg}, status=status.HTTP_200_OK)
