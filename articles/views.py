@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView
 from .models import Article
 from .serializers import ArticleSerializer, ArticleDetailSerializer
 from .validators import validate_create
@@ -55,13 +55,29 @@ class ArticleDetailAPIView(APIView):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk):
         article = self.get_object(pk)
         if article.author == request.user:
-            article.delete()
+            article.soft_delete()
             data = f"{pk}번 게시물 삭제"
             return Response(data)
         else:
-            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+
+class FreeArticleListAPIView(ListAPIView):
+    pagination_class = PageNumberPagination
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.filter(category='Free').order_by('-pk')
+
+
+class AskArticleListAPIView(ListAPIView):
+    pagination_class = PageNumberPagination
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        return Article.objects.filter(category='Ask').order_by('-pk')
