@@ -13,6 +13,4 @@ class ArticleDetailSerializer(ArticleSerializer):
         model = Article
         fields = ('id', 'title', 'content', 'author',
                   'category', 'created_at', 'updated_at')
-        
 
-# Comment Serializer
