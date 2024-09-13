@@ -14,11 +14,13 @@ from nbcns.models import NBCN
 from nbcns.serializers import NBCNSerializer
 
 
+# 게시물 목록 조회, 게시물 등록
 class ArticleListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request):
         res_data = {}
+        # 메인 페이지에서 nbcns의 최신 게시물 5개와, 인기 게시물 5개를 보여줌
         nbcns = NBCN.objects.all().order_by("-pk")[:5]
         nbcns_seri5 = NBCNSerializer(nbcns, many=True)
         articles = Article.objects.annotate(likes_count=Count("like_users")).order_by(
@@ -30,10 +32,12 @@ class ArticleListCreateAPIView(ListCreateAPIView):
         return Response(res_data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        # 유효성 검증
         is_valid, error_message = validate_create(request.data)
         if not is_valid:
             return Response(f"{error_message}", status=status.HTTP_400_BAD_REQUEST)
 
+        # 관리자인지 확인하고 아니라면 카테고리가 Company인지 user가 마스터인지 확인함
         if not request.user.is_superuser and (request.data.get("category") == "Company" and not request.user.is_master):
             return Response({"error_message": "Company 글은 Master만 작성할 수 있습니다."},
                             status=status.HTTP_403_FORBIDDEN)
@@ -49,9 +53,11 @@ class ArticleListCreateAPIView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# 게시물 상세 조회, 수정, 삭제
 class ArticleDetailAPIView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
+    # url에서 보낸 pk값으로 게시물을 찾음
     def get_object(self, pk):
         return get_object_or_404(Article, id=pk)
 
@@ -60,6 +66,7 @@ class ArticleDetailAPIView(APIView):
         serializer = ArticleDetailSerializer(article)
         return Response(serializer.data)
 
+    # 수정, 삭제시 게시물 작성자가 로그인한 유저와 일치한지 확인하고 아니라면 허락하지 않음
     def put(self, request, pk):
         article = self.get_object(pk)
         if article.author == request.user:
@@ -75,6 +82,7 @@ class ArticleDetailAPIView(APIView):
     def delete(self, request, pk):
         article = self.get_object(pk)
         if article.author == request.user:
+            # 실제로 데이터베이스에서 삭제하는게 아니라 비활성화 시켜서 조회가 안되도록 함
             article.soft_delete()
             data = f"{pk}번 게시물 삭제"
             return Response(data)
@@ -82,6 +90,7 @@ class ArticleDetailAPIView(APIView):
             return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
 
+# 자유 게시판 조회
 class FreeArticleListAPIView(ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = ArticleSerializer
@@ -100,6 +109,7 @@ class FreeArticleListAPIView(ListAPIView):
             )
 
 
+# 질문 게시판 조회
 class AskArticleListAPIView(ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = ArticleSerializer
@@ -117,6 +127,7 @@ class AskArticleListAPIView(ListAPIView):
             )
 
 
+# 홍보 게시판 조회
 class CompanyArticleListAPIView(ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = ArticleSerializer
@@ -141,11 +152,11 @@ class BookmarkAPIView(APIView):
     def post(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
         user = request.user
-        if not user in article.bookmark_articles.all():
-            article.bookmark_articles.add(request.user)
+        if not user in article.bookmark_users.all():
+            article.bookmark_users.add(request.user)
             return Response("북마크", status=status.HTTP_200_OK)
         else:
-            article.bookmark_articles.remove(request.user)  # 북마크 취소
+            article.bookmark_users.remove(request.user)  # 북마크 취소
             return Response("북마크 취소됨", status=status.HTTP_200_OK)
 
 
@@ -201,7 +212,8 @@ class CommentDetailAPIView(APIView):
             return Response({"error_message": "댓글을 수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
         # 댓글 데이터를 요청 데이터로 업데이트 (부분 업데이트 가능)
-        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        serializer = CommentSerializer(
+            comment, data=request.data, partial=True)
         # 유효성 검사
         if serializer.is_valid():
             serializer.save()
@@ -210,7 +222,7 @@ class CommentDetailAPIView(APIView):
 
     def delete(self, request, pk, comment_pk):
         comment = self.get_object(pk, comment_pk)
-        
+
         # 작성자만 댓글 삭제 가능
         if comment.user != request.user:
             return Response({"error_message": "댓글을 삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
