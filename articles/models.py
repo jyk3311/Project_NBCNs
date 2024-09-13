@@ -45,7 +45,14 @@ class Article(ArticleBaseModel):
     category = models.CharField(max_length=7, choices=category_choices)
     is_mine = models.BooleanField(default=True)
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="articles"
+    )
+    like_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='like_articles'
+    )
+
+    bookmark_articles = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='bookmark_users'
     )
 
     def __str__(self):

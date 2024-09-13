@@ -1,3 +1,4 @@
+
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,16 +9,25 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView
 from .models import Article, Comment
 from .serializers import ArticleSerializer, ArticleDetailSerializer, CommentSerializer
 from .validators import validate_create
+from django.db.models import Count
+from nbcns.models import NBCN
+from nbcns.serializers import NBCNSerializer
 
 
 class ArticleListCreateAPIView(ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    pagination_class = PageNumberPagination
-    serializer_class = ArticleSerializer
-
-    def get_queryset(self):
-        return Article.objects.all().order_by("-pk")
+    def get(self, request):
+        res_data = {}
+        nbcns = NBCN.objects.all().order_by("-pk")[:5]
+        nbcns_seri5 = NBCNSerializer(nbcns, many=True)
+        articles = Article.objects.annotate(likes_count=Count("like_users")).order_by(
+            "-likes_count", "-created_at"
+        )[:5]
+        article_seri5 = ArticleSerializer(articles, many=True)
+        res_data['nbcns'] = nbcns_seri5.data
+        res_data['articles'] = article_seri5.data
+        return Response(res_data, status=status.HTTP_200_OK)
 
     def post(self, request):
         is_valid, error_message = validate_create(request.data)
@@ -77,7 +87,17 @@ class FreeArticleListAPIView(ListAPIView):
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
-        return Article.objects.filter(category='Free').order_by('-pk')
+
+        # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
+        sort_option = self.request.GET.get('sort', '-created_at')
+        if sort_option == '-created_at':
+            return Article.objects.filter(category='Free').order_by(
+                '-created_at')
+        else:
+            # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
+            return Article.objects.filter(category='Free').annotate(likes_count=Count("like_users")).order_by(
+                "-likes_count", "-created_at"
+            )
 
 
 class AskArticleListAPIView(ListAPIView):
@@ -85,7 +105,16 @@ class AskArticleListAPIView(ListAPIView):
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
-        return Article.objects.filter(category='Ask').order_by('-pk')
+        # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
+        sort_option = self.request.GET.get('sort', '-created_at')
+        if sort_option == '-created_at':
+            return Article.objects.filter(category='Ask').order_by(
+                '-created_at')
+        else:
+            # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
+            return Article.objects.filter(category='Ask').annotate(likes_count=Count("like_users")).order_by(
+                "-likes_count", "-created_at"
+            )
 
 
 class CompanyArticleListAPIView(ListAPIView):
@@ -93,8 +122,46 @@ class CompanyArticleListAPIView(ListAPIView):
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
-        return Article.objects.filter(category='Company').order_by('-pk')
-    
+        # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
+        sort_option = self.request.GET.get('sort', '-created_at')
+        if sort_option == '-created_at':
+            return Article.objects.filter(category='Company').order_by(
+                '-created_at')
+        else:
+            # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
+            return Article.objects.filter(category='Company').annotate(likes_count=Count("like_users")).order_by(
+                "-likes_count", "-created_at"
+            )
+
+
+class BookmarkAPIView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        user = request.user
+        if not user in article.bookmark_articles.all():
+            article.bookmark_articles.add(request.user)
+            return Response("북마크", status=status.HTTP_200_OK)
+        else:
+            article.bookmark_articles.remove(request.user)  # 북마크 취소
+            return Response("북마크 취소됨", status=status.HTTP_200_OK)
+
+
+class LikesAPIView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        if article.like_users.filter(pk=request.user.pk).exists():
+            article.like_users.remove(request.user)  # 좋아요 취소
+            return Response("좋아요 취소됨", status=status.HTTP_200_OK)
+        else:
+            article.like_users.add(request.user)
+            return Response("좋아요", status=status.HTTP_200_OK)
+
 
 # 특정 게시글에 대한 댓글 목록 조회 및 댓글 작성
 class CommentListCreateAPIView(APIView):

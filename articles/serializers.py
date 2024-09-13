@@ -13,6 +13,10 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('id', 'title', 'author', 'category', 'created_at')
+        read_only_fields = ['title', 'author', 'category']
+    def get_bookmark(self, object):
+        return object.bookmark_articles.username
+    
 
 
 class ArticleDetailSerializer(ArticleSerializer):
