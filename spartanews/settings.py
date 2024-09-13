@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-import os
 import config
 
 
@@ -46,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_seed",
     "rest_framework_simplejwt.token_blacklist",
+    'django_seed',
     # Local
     "accounts",
     "articles",
