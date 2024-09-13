@@ -39,7 +39,7 @@ class ArticleListCreateAPIView(ListCreateAPIView):
 
         # 관리자인지 확인하고 아니라면 카테고리가 Company인지 user가 마스터인지 확인함
         if not request.user.is_superuser and (request.data.get("category") == "Company" and not request.user.is_master):
-            return Response({"error_message": "Company 글은 Master만 작성할 수 있습니다."},
+            return Response({"message": "Company 글은 Master만 작성할 수 있습니다."},
                             status=status.HTTP_403_FORBIDDEN)
 
         article = Article.objects.create(
@@ -77,70 +77,33 @@ class ArticleDetailAPIView(APIView):
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk):
         article = self.get_object(pk)
         if article.author == request.user:
             # 실제로 데이터베이스에서 삭제하는게 아니라 비활성화 시켜서 조회가 안되도록 함
             article.soft_delete()
-            data = f"{pk}번 게시물 삭제"
-            return Response(data)
+            return Response({"success": "성공적으로 삭제되었습니다."})
         else:
-            return Response({"error_message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
 
-# 자유 게시판 조회
-class FreeArticleListAPIView(ListAPIView):
+# 카테고리별 게시판 조회
+class CategoryArticleListAPIView(ListAPIView):
     pagination_class = PageNumberPagination
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
-
+        category = self.kwargs.get('category')
         # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
         sort_option = self.request.GET.get('sort', '-created_at')
         if sort_option == '-created_at':
-            return Article.objects.filter(category='Free').order_by(
+            return Article.objects.filter(category=category).order_by(
                 '-created_at')
         else:
             # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
-            return Article.objects.filter(category='Free').annotate(likes_count=Count("like_users")).order_by(
-                "-likes_count", "-created_at"
-            )
-
-
-# 질문 게시판 조회
-class AskArticleListAPIView(ListAPIView):
-    pagination_class = PageNumberPagination
-    serializer_class = ArticleSerializer
-
-    def get_queryset(self):
-        # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
-        sort_option = self.request.GET.get('sort', '-created_at')
-        if sort_option == '-created_at':
-            return Article.objects.filter(category='Ask').order_by(
-                '-created_at')
-        else:
-            # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
-            return Article.objects.filter(category='Ask').annotate(likes_count=Count("like_users")).order_by(
-                "-likes_count", "-created_at"
-            )
-
-
-# 홍보 게시판 조회
-class CompanyArticleListAPIView(ListAPIView):
-    pagination_class = PageNumberPagination
-    serializer_class = ArticleSerializer
-
-    def get_queryset(self):
-        # GET 요청으로 sort 매개변수값 가져옴/ 기본값은 '-created_at'
-        sort_option = self.request.GET.get('sort', '-created_at')
-        if sort_option == '-created_at':
-            return Article.objects.filter(category='Company').order_by(
-                '-created_at')
-        else:
-            # 테이블에 likes_count라는 컬럼이 없는데 우리가 조회할때 임시로 만들어서 쓰는게 annotate->order_by해서 products에 넣음
-            return Article.objects.filter(category='Company').annotate(likes_count=Count("like_users")).order_by(
+            return Article.objects.filter(category=category).annotate(likes_count=Count("like_users")).order_by(
                 "-likes_count", "-created_at"
             )
 
@@ -154,10 +117,10 @@ class BookmarkAPIView(APIView):
         user = request.user
         if not user in article.bookmark_users.all():
             article.bookmark_users.add(request.user)
-            return Response("북마크", status=status.HTTP_200_OK)
+            return Response({"message": "북마크"}, status=status.HTTP_200_OK)
         else:
             article.bookmark_users.remove(request.user)  # 북마크 취소
-            return Response("북마크 취소됨", status=status.HTTP_200_OK)
+            return Response({"message": "북마크 취소됨"}, status=status.HTTP_200_OK)
 
 
 class LikesAPIView(APIView):
@@ -168,10 +131,10 @@ class LikesAPIView(APIView):
         article = get_object_or_404(Article, pk=pk)
         if article.like_users.filter(pk=request.user.pk).exists():
             article.like_users.remove(request.user)  # 좋아요 취소
-            return Response("좋아요 취소됨", status=status.HTTP_200_OK)
+            return Response({"message": "좋아요 취소됨"}, status=status.HTTP_200_OK)
         else:
             article.like_users.add(request.user)
-            return Response("좋아요", status=status.HTTP_200_OK)
+            return Response({"message": "좋아요"}, status=status.HTTP_200_OK)
 
 
 # 특정 게시글에 대한 댓글 목록 조회 및 댓글 작성
@@ -209,7 +172,7 @@ class CommentDetailAPIView(APIView):
         comment = self.get_object(pk, comment_pk)
         # 작성자만 댓글 수정 가능
         if comment.user != request.user:
-            return Response({"error_message": "댓글을 수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "댓글을 수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
         # 댓글 데이터를 요청 데이터로 업데이트 (부분 업데이트 가능)
         serializer = CommentSerializer(
@@ -225,7 +188,7 @@ class CommentDetailAPIView(APIView):
 
         # 작성자만 댓글 삭제 가능
         if comment.user != request.user:
-            return Response({"error_message": "댓글을 삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "댓글을 삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
         # Soft delete (실제 삭제 대신 is_mine 필드를 False로 설정)
         comment.soft_delete()
