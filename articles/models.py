@@ -25,6 +25,7 @@ class ArticleBaseModel(models.Model):
     Django는 ArticleBaseModel이 상속되는 과정에서
     부모 클래스에 article이라는 속성(메소드, 필드 등)이 있을 가능성을 먼저 확인하고
     그 결과 이름 충돌이 발생한다고 판단할 수 있다.
+    따라서 부모 클래스를 추상 클래스 임을 지정하는 코드 추가
     '''
     class Meta:
         abstract = True  # 이 모델이 추상 클래스임을 지정
