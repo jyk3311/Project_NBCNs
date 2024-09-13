@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_seed",
     "rest_framework_simplejwt.token_blacklist",
-    'django_seed',
     # Local
     "accounts",
     "articles",

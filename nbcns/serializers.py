@@ -2,10 +2,12 @@ from rest_framework import serializers
 from .models import NBCN
 
 # NBCN 모델
+
+
 class NBCNSerializer(serializers.ModelSerializer):
     class Meta:
         model = NBCN
-        fields = ['id', 'title', 'link', 'content', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'link', 'created_at', 'updated_at']
         read_only_fields = ['title', 'link', 'content']
 
     # 유효성 검사 메서드를 오버라이드하여 커스텀 유효성 검사 로직을 추가

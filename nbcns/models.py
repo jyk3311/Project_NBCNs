@@ -11,8 +11,8 @@ class NBCN(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    bookmark_nbcns = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='nbcn_bookmark_users')
+    nbcn_bookmark_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='bookmark_nbcns')
 
     def __str__(self):
         return self.title
