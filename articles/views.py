@@ -129,7 +129,7 @@ class CommentDetailAPIView(APIView):
 
     def put(self, request, pk, comment_pk):
         comment = self.get_object(pk, comment_pk)
-        # 작성자만 댓글을 수정할 수 있음
+        # 작성자만 댓글 수정 가능
         if comment.user != request.user:
             return Response({"error_message": "댓글을 수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -141,3 +141,14 @@ class CommentDetailAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk, comment_pk):
+        comment = self.get_object(pk, comment_pk)
+        
+        # 작성자만 댓글 삭제 가능
+        if comment.user != request.user:
+            return Response({"error_message": "댓글을 삭제할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+        # Soft delete (실제 삭제 대신 is_mine 필드를 False로 설정)
+        comment.soft_delete()
+
+        return Response({"message": "댓글이 소프트 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
