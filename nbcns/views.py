@@ -41,14 +41,13 @@ class NBCNListCreateAPIView(APIView):
         title, cleaned_text = fetch_title_and_clean_content(
             link)  # 링크로부터 제목과 정리된 텍스트를 가져오는 함수 호출
         content = NBCNGpts(cleaned_text)  # 클린업된 내용을 요약하는 함수 호출
-
         # 생성된 데이터를 사용하여 NBCN 인스턴스를 생성
         serializer = NBCNSerializer(data={
             'title': title,
             'link': link,
             'content': content
         })
-
+        print(serializer)
         # 직렬화 데이터가 유효성 체크 저장 그리고 응답 반환
         if serializer.is_valid():
             serializer.save()

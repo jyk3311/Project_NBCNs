@@ -7,12 +7,5 @@ from .models import NBCN
 class NBCNSerializer(serializers.ModelSerializer):
     class Meta:
         model = NBCN
-        fields = ['id', 'title', 'link', 'created_at', 'updated_at']
-        read_only_fields = ['title', 'link', 'content']
-
-    # 유효성 검사 메서드를 오버라이드하여 커스텀 유효성 검사 로직을 추가
-    def validate(self, data):
-        # 'link' 필드가 필수임을 확인하고 없을 경우 ValidationError를 발생시킴
-        if not data.get('link'):
-            raise serializers.ValidationError({"link": "이 필드는 필수 항목입니다."})
-        return data
+        fields = ['id', 'title', 'link', 'content', 'created_at', 'updated_at']
+        write_only_fields = ['title', 'link', 'content']
