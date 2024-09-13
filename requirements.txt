@@ -4,11 +4,13 @@ asgiref==3.8.1
 beautifulsoup4==4.12.3
 certifi==2024.8.30
 charset-normalizer==3.3.2
+colorama==0.4.6
 distro==1.9.0
 Django==4.2
 django-seed==0.3.1
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
+exceptiongroup==1.2.2
 Faker==28.1.0
 h11==0.14.0
 httpcore==1.0.5
@@ -17,6 +19,7 @@ idna==3.8
 jiter==0.5.0
 openai==1.44.1
 pillow==10.4.0
+psycopg2==2.9.9
 pydantic==2.9.1
 pydantic_core==2.23.3
 PyJWT==2.9.0
