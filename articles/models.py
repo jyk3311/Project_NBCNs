@@ -18,6 +18,17 @@ class ArticleBaseModel(models.Model):
     # 장고에서 제공하는 기본 매니저를 커스텀 매니저로 사용
     objects = ActiveManager()
 
+    '''
+    ERRORS: articles.Comment.article: 
+    (models.E006) The field 'article' clashes with the field 'article' from model 'articles.articlebasemodel'.
+    실제로 부모 클래스에 article 필드가 존재하지 않지만 Comment.article 필드와 충돌이 생김
+    Django는 ArticleBaseModel이 상속되는 과정에서
+    부모 클래스에 article이라는 속성(메소드, 필드 등)이 있을 가능성을 먼저 확인하고
+    그 결과 이름 충돌이 발생한다고 판단할 수 있다.
+    '''
+    class Meta:
+        abstract = True  # 이 모델이 추상 클래스임을 지정
+
     def soft_delete(self):
         self.is_mine = False
         self.save()

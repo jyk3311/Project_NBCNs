@@ -108,7 +108,7 @@ class CommentListCreateAPIView(APIView):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    # POST 요청: 특정 게시글에 댓글 작성
+    # 특정 게시글에 댓글 작성
     def post(self, request, pk):
         # 특정 게시글을 가져오고 request.data 직렬화
         article = Article.objects.get(pk=pk)
@@ -121,4 +121,23 @@ class CommentListCreateAPIView(APIView):
 
 # 특정 댓글 수정 및 삭제
 class CommentDetailAPIView(APIView):
-    pass
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    # 해당 댓글 객체 가져오기
+    def get_object(self, pk, comment_pk):
+        return Comment.objects.get(pk=comment_pk, article__pk=pk)  # (게시글과 댓글의 pk로 검색)
+
+    def put(self, request, pk, comment_pk):
+        comment = self.get_object(pk, comment_pk)
+        # 작성자만 댓글을 수정할 수 있음
+        if comment.user != request.user:
+            return Response({"error_message": "댓글을 수정할 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+        # 댓글 데이터를 요청 데이터로 업데이트 (부분 업데이트 가능)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        # 유효성 검사
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    

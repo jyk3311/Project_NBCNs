@@ -9,7 +9,7 @@ urlpatterns = [
     path("<int:pk>", views.ArticleDetailAPIView.as_view()),
     # Comment Urls
     # GET(댓글 조회) & POST(댓글 작성)
-    path('articles/<int:pk>/comments/', views.CommentListCreateAPIView.as_view()),
-    path('articles/<int:pk>/comments/<int:comment_pk>/',
+    path('<int:pk>/comments/', views.CommentListCreateAPIView.as_view()),
+    path('<int:pk>/comments/<int:comment_pk>/',
          views.CommentDetailAPIView.as_view()),  # PUT(댓글 수정) & DELETE(댓글 삭제)
 ]
