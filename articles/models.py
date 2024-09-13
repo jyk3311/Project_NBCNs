@@ -7,6 +7,7 @@ is_authenticated가 True인 객체만을 조회하도록
 get_queryset 메소드를 오버라이딩함.
 """
 
+
 # 삭제되지 않은 객체만 반환하는 커스텀 매니저
 class ActiveManager(models.Manager):
     def get_queryset(self):
@@ -36,8 +37,8 @@ class ArticleBaseModel(models.Model):
 
 
 class Article(ArticleBaseModel):
-    category_choices = [("Free", "자유 게시판"),
-                        ("Ask", "질문 게시판"), ("Company", "홍보 게시판")]
+    category_choices = [("free", "자유 게시판"),
+                        ("ask", "질문 게시판"), ("company", "홍보 게시판")]
     title = models.CharField(max_length=50)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,8 +52,8 @@ class Article(ArticleBaseModel):
         settings.AUTH_USER_MODEL, related_name='like_articles'
     )
 
-    bookmark_articles = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='bookmark_users'
+    bookmark_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='bookmark_articles'
     )
 
     def __str__(self):
