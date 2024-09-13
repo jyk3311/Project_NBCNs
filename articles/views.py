@@ -1,3 +1,4 @@
+
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
@@ -94,3 +95,32 @@ class CompanyArticleListAPIView(ListAPIView):
 
     def get_queryset(self):
         return Article.objects.filter(category='Company').order_by('-pk')
+
+
+class BookmarkAPIView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        user = request.user
+        if not user in article.bookmark_articles.all():
+            article.bookmark_articles.add(request.user)
+            return Response("북마크", status=status.HTTP_200_OK)
+        else:
+            article.bookmark_articles.remove(request.user)  # 북마크 취소
+            return Response("북마크 취소됨", status=status.HTTP_200_OK)
+
+
+class LikesAPIView(APIView):
+
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def post(self, request, pk):
+        article = get_object_or_404(Article, pk=pk)
+        if article.like_users.filter(pk=request.user.pk).exists():
+            article.like_users.remove(request.user)  # 좋아요 취소
+            return Response("좋아요 취소됨", status=status.HTTP_200_OK)
+        else:
+            article.like_users.add(request.user)
+            return Response("좋아요", status=status.HTTP_200_OK)

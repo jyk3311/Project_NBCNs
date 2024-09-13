@@ -1,4 +1,4 @@
-from .models import NBCN, NBCN_Bookmark
+from .models import NBCN
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from .functions import NBCNGpts, fetch_title_and_clean_content  # 함수 임포트
 from django.shortcuts import get_object_or_404
@@ -77,13 +77,12 @@ class NBCNBookmarkAPIView(APIView):
 
     # 특정 NBCN 객체를 북마크하거나 삭제하는 메서드 (POST 요청 처리)
     def post(self, request, pk):
-        nbcn = get_object_or_404(NBCN, pk=pk)  # pk로 NBCN 객체를 찾거나 404 오류 반환
-        bookmark, created = NBCN_Bookmark.objects.get_or_create(user=request.user, NBCN=nbcn)  # 북마크 객체 생성 또는 검색
-
-        if created:
-            # 북마크가 새로 생성된 경우
-            return Response({"message": "북마크 추가"}, status=status.HTTP_201_CREATED)
+        nbcn_article = get_object_or_404(NBCN, pk=pk)
+        user = request.user
+        if not user in nbcn_article.bookmark_nbcns.all():
+            nbcn_article.bookmark_nbcns.add(request.user)
+            return Response("북마크", status=status.HTTP_200_OK)
         else:
-            # 이미 존재하는 경우 삭제
-            bookmark.delete()
-            return Response({"message": "북마크가 삭제되었습니다."}, status=status.HTTP_200_OK)
+            nbcn_article.bookmark_nbcns.remove(request.user)  # 북마크 취소
+            return Response("북마크 취소됨", status=status.HTTP_200_OK)
+

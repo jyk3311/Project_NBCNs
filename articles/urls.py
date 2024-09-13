@@ -7,4 +7,6 @@ urlpatterns = [
     path("ask/", views.AskArticleListAPIView.as_view()),
     path("company/", views.CompanyArticleListAPIView.as_view()),
     path("<int:pk>", views.ArticleDetailAPIView.as_view()),
+    path("<int:pk>/bookmark/", views.BookmarkAPIView.as_view()),
+    path("<int:pk>/like/", views.LikesAPIView.as_view()),
 ]
