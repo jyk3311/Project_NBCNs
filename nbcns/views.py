@@ -11,10 +11,10 @@ from .serializers import NBCNSerializer
 class IsSuperuserForWriteOperations(BasePermission):
     def has_permission(self, request, view):
         # POST와 DELETE 요청에 대해서는 사용자가 최고 관리자인지 검사
-        if request.method in ('POST', 'DELETE'):
+        if request.method in ('POST', 'DELETE', 'PUT'):
             return request.user and request.user.is_superuser
         # 그 외의 요청은 인증된 사용자면 허용
-        return request.user and request.user.is_authenticated
+        return True
 
 
 # NBCN 목록을 조회 / 생성
