@@ -6,11 +6,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import authenticate
 from articles.models import Article
+from nbcns.models import NBCN
+from nbcns.serializers import NBCNSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from articles.serializers import ArticleSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
 # 회원가입 및 회원탈퇴
 
 
@@ -175,7 +178,14 @@ class MyBookmarkListAPIView(APIView):
         if user != request.user:
             return Response("잘못된 접근입니다. 내 프로필이 맞는지 확인하세요.", status=status.HTTP_403_FORBIDDEN)
         else:
+            response_seri = {}
             articles = Article.objects.filter(
                 bookmark_articles__username=username)
             serializers = ArticleSerializer(articles, many=True)
-            return Response(serializers.data, status=status.HTTP_200_OK)
+            response_seri['articles'] = serializers.data
+            nbcn_articles = NBCN.objects.filter(
+                bookmark_nbcns__username=username
+            )
+            serializers2 = NBCNSerializer(nbcn_articles, many=True)
+            response_seri['nbcn'] = serializers2.data
+            return Response(response_seri, status=status.HTTP_200_OK)
