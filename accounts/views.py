@@ -9,12 +9,17 @@ from articles.models import Article
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import render
-
+from articles.serializers import ArticleSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # 회원가입 및 회원탈퇴
 
 
 class AccountsView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     # 회원가입 및 user 생성
     def post(self, request):
         user_obj = request.user
@@ -89,6 +94,8 @@ class LoginView(APIView):
 
 # 로그아웃
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         refresh_token_str = request.data.get("refresh_token")
         try:
@@ -104,7 +111,9 @@ class LogoutView(APIView):
 
 # 프로필 조회, 회원정보 수정, 비밀번호 변경
 class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
     # 프로필 조회
+
     def get(self, request, username):
         try:
             user = User.objects.get(username=username)
@@ -147,10 +156,15 @@ class UpdateProfileView(APIView):
         return Response({"success": msg}, status=status.HTTP_200_OK)
 
 
-# 내 게시물 목록
+# 유저의 게시물 목록
 class MyArticleListAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, username):
-        return Article.objects.filter(author=username)
+        articles = Article.objects.filter(author__username=username)
+        print(articles)
+        serializers = ArticleSerializer(articles, many=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 # 북마크 목록
@@ -159,6 +173,9 @@ class MyBookmarkListAPIView(APIView):
         # 사용자랑 프로필 보려는 사람이랑 같지않으면
         user = User.objects.get(username=username)
         if user != request.user:
-            return Response("잘못된 접근입니다. 내 프로필이 맞는지 확인하세요.", status=status.HTTP_401_UNAUTHORIZED)
+            return Response("잘못된 접근입니다. 내 프로필이 맞는지 확인하세요.", status=status.HTTP_403_FORBIDDEN)
         else:
-            return Article.objects.filter(user.username)
+            articles = Article.objects.filter(
+                bookmark_articles__username=username)
+            serializers = ArticleSerializer(articles, many=True)
+            return Response(serializers.data, status=status.HTTP_200_OK)

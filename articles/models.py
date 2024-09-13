@@ -1,14 +1,5 @@
 from django.db import models
 from django.conf import settings
-class Article(models.Model):
-
-    like_users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='like_articles'
-    )
-
-    bookmarking = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name='bookmarked'
-    )
 
 """
 moels.Manager의 get_queryset 메소드를 호출하여 데이터를 조회할 때
@@ -33,7 +24,14 @@ class Article(models.Model):
     category = models.CharField(max_length=7, choices=category_choices)
     is_mine = models.BooleanField(default=True)
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="articles"
+    )
+    like_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='like_articles'
+    )
+
+    bookmark_articles = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name='bookmark_users'
     )
 
     # 장고에서 제공하는 기본 매니저를 커스텀 매니저로 사용

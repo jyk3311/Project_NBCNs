@@ -103,11 +103,13 @@ class BookmarkAPIView(APIView):
 
     def post(self, request, pk):
         article = get_object_or_404(Article, pk=pk)
-        if article.bookmarking.filter(pk=request.user.pk).exists():
-            article.bookmarking.remove(request.user)  # 북마크 취소
+        user = request.user
+        if not user in article.bookmark_articles.all():
+            article.bookmark_articles.add(request.user)
+            return Response("북마크", status=status.HTTP_200_OK)
         else:
-            article.bookmarking.add(request.user)
-        return Response("성공", status=status.HTTP_200_OK)
+            article.bookmark_articles.remove(request.user)  # 북마크 취소
+            return Response("북마크 취소됨", status=status.HTTP_200_OK)
 
 
 class LikesAPIView(APIView):
@@ -118,6 +120,7 @@ class LikesAPIView(APIView):
         article = get_object_or_404(Article, pk=pk)
         if article.like_users.filter(pk=request.user.pk).exists():
             article.like_users.remove(request.user)  # 좋아요 취소
+            return Response("좋아요 취소됨", status=status.HTTP_200_OK)
         else:
             article.like_users.add(request.user)
-        return Response("성공", status=status.HTTP_200_OK)
+            return Response("좋아요", status=status.HTTP_200_OK)
