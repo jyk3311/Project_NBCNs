@@ -125,7 +125,7 @@ class CommentDetailAPIView(APIView):
 
     # 해당 댓글 객체 가져오기
     def get_object(self, pk, comment_pk):
-        return Comment.objects.get(pk=comment_pk, article__pk=pk)  # (게시글과 댓글의 pk로 검색)
+        return get_object_or_404(Comment, pk=comment_pk, article__pk=pk)
 
     def put(self, request, pk, comment_pk):
         comment = self.get_object(pk, comment_pk)
@@ -140,4 +140,4 @@ class CommentDetailAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
