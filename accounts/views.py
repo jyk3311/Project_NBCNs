@@ -174,7 +174,12 @@ class MyArticleListAPIView(APIView):
 
 # 북마크 목록
 class MyBookmarkListAPIView(APIView):
-    def get(self, request, username):
+    def get(self, request, username):        
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"error": "사용자를 찾을 수 없습니다."},
+                            status=status.HTTP_404_NOT_FOUND)
         # 사용자랑 프로필 보려는 사람이랑 같지않으면
         user = User.objects.get(username=username)
         if user != request.user:
