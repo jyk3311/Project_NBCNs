@@ -164,7 +164,6 @@ class MyArticleListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, username):
-        print(username)
         if not User.objects.filter(username=username).exists():
             return Response({"message": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
         else:
