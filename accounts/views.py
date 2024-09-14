@@ -164,10 +164,13 @@ class MyArticleListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, username):
-        articles = Article.objects.filter(author__username=username)
-        print(articles)
-        serializers = ArticleSerializer(articles, many=True)
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        print(username)
+        if not User.objects.filter(username=username).exists():
+            return Response({"message": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            articles = Article.objects.filter(author__username=username)
+            serializers = ArticleSerializer(articles, many=True)
+            return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 # 북마크 목록
@@ -180,11 +183,11 @@ class MyBookmarkListAPIView(APIView):
         else:
             response_seri = {}
             articles = Article.objects.filter(
-                bookmark_articles__username=username)
+                bookmark_users__username=username)
             serializers = ArticleSerializer(articles, many=True)
             response_seri['articles'] = serializers.data
             nbcn_articles = NBCN.objects.filter(
-                bookmark_nbcns__username=username
+                nbcn_bookmark_users__username=username
             )
             serializers2 = NBCNSerializer(nbcn_articles, many=True)
             response_seri['nbcn'] = serializers2.data

@@ -9,3 +9,4 @@ class NBCNSerializer(serializers.ModelSerializer):
         model = NBCN
         fields = ['id', 'title', 'link', 'content', 'created_at', 'updated_at']
         write_only_fields = ['title', 'link', 'content']
+        
