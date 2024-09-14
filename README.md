@@ -85,9 +85,7 @@ python manage.py runserver
 
 ### ERD 이미지
 
-```markdown
 ![image (4)](https://github.com/user-attachments/assets/fb7fac6c-7069-4e67-a640-f62449ea8c3b)
-```
 
 ### ERD 설명
 
