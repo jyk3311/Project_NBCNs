@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import NBCNSerializer
+from .serializers import NBCNSerializer, NBCNDetailSerializer
 
 # 사용자 권한을 정의하는 클래스
 
@@ -42,12 +42,11 @@ class NBCNListCreateAPIView(APIView):
             link)  # 링크로부터 제목과 정리된 텍스트를 가져오는 함수 호출
         content = NBCNGpts(cleaned_text)  # 클린업된 내용을 요약하는 함수 호출
         # 생성된 데이터를 사용하여 NBCN 인스턴스를 생성
-        serializer = NBCNSerializer(data={
+        serializer = NBCNDetailSerializer(data={
             'title': title,
             'link': link,
             'content': content
         })
-        print(serializer)
         # 직렬화 데이터가 유효성 체크 저장 그리고 응답 반환
         if serializer.is_valid():
             serializer.save()
@@ -65,7 +64,7 @@ class NBCNDetailAPIView(APIView):
     # 특정 NBCN 조회
     def get(self, request, pk):
         nbcn = get_object_or_404(NBCN, pk=pk)
-        serializer = NBCNSerializer(nbcn)
+        serializer = NBCNDetailSerializer(nbcn)
         return Response(serializer.data)
 
     # 특정 NBCN 삭제
