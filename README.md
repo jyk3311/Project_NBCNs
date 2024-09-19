@@ -55,7 +55,7 @@ python manage.py runserver
 
 ## 🖇️ 와이어 프레임
 
-
+![Wire_frame](https://github.com/user-attachments/assets/ac88f844-acc6-4879-b890-11b885af0d9b)
 
 ---
 
