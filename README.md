@@ -1,4 +1,4 @@
-# 🌈 NBCN (Newbie Coding News)
+# 🎁 NBCN (Newbie Coding News)
 
 NBCN(Newbie Coding News)은 IT 산업의 초보자들을 위한 **뉴스 및 커뮤니티 플랫폼**입니다. 이 프로젝트는 Django와 Django REST Framework(DRF)를 기반으로 구현되었으며, 사용자는 크롤링된 IT 관련 뉴스를 확인하고, AI 요약본을 통해 뉴스를 빠르게 파악할 수 있습니다. 또한 사용자 등급에 따라 질문 게시판, 자유 게시판, 홍보 게시판에 게시글을 작성하고 댓글을 달 수 있습니다.
 
@@ -59,26 +59,26 @@ python manage.py runserver
 
 | 기능                    | HTTP 메서드 | 엔드포인트                                   | 설명                                      |
 |-------------------------|-------------|---------------------------------------------|-------------------------------------------|
-| **회원가입**            | POST        | `/api/accounts/`                            | 사용자 정보를 입력해 회원가입 후 JWT 토큰 발급  |
-| **회원 탈퇴**           | DELETE      | `/api/accounts/`                            | 회원 탈퇴 (소프트 삭제)                       |
-| **로그인**              | POST        | `/api/accounts/login/`                      | 유저네임, 비밀번호로 로그인 후 JWT 토큰 발급    |
-| **로그아웃**             | POST        | `/api/accounts/logout/`                     | 소프트 삭제로 is_active 계정 비활성화       |
-| **프로필 조회 및 수정**  | GET/POST     | `/api/accounts/<str:username>/`             | 로그인한 사용자의 정보(북마크, 작성글 포함)를 조회 |
-| **게시글 목록 조회**     | GET         | `/api/articles/(free/ask/company)/`        | 자유, 질문, 홍보 게시글 목록 조회              |
-| **게시글 작성**         | POST        | `/api/articles/`                            | 새로운 게시글 작성                             |
-| **게시글 수정**         | PUT         | `/api/articles/<int:pk>/`                       | 기존 게시글 수정                               |
-| **게시글 삭제**         | DELETE      | `/api/articles/<int:pk>/`                       | 게시글 삭제                                    |
-| **게시글 좋아요**        | POST        | `/api/articles/<int:pk>/like/`               | 게시글에 좋아요 추가/취소                      |
-| **게시글 북마크**        | POST        | `/api/articles/<int:pk>/bookmark/`              | 게시글을 북마크에 추가/제거                     |
-| **뉴스 목록 조회**       | GET         | `/api/nbcns/`                               | 크롤링된 뉴스 목록을 조회                      |
-| **뉴스 생성**            | POST        | `/api/nbcns/`                               | 새로운 뉴스 생성                              |
-| **뉴스 상세 조회**       | GET        | `/api/nbcns/<int:pk>/`                          | 선택한 뉴스 조회                              |
-| **뉴스 삭제**          | DELETE       | `/api/nbcns/<int:pk>/`                          | 선택한 뉴스 삭제                              |
-| **뉴스 북마크**         | POST        | `/api/nbcns/<int:pk>/bookmark/`                 | 뉴스 북마크 추가/취소                         |
-| **댓글 목록 조회**       | GET         | `/api/articles/<int:pk>/comments/`              | 특정 게시글의 댓글 목록 조회                    |
-| **댓글 작성**           | POST        | `/api/articles/<int:pk>/comments/`              | 특정 게시글에 댓글 작성                         |
-| **댓글 수정**           | PUT         | `/api/comments/<int:pk>/`                       | 댓글 수정                                      |
-| **댓글 삭제**           | DELETE      | `/api/comments/<int:pk>/`                       | 댓글 삭제 (소프트 삭제)                         |
+| **회원가입**            | POST        | `/api/v1/accounts/`                            | 사용자 정보를 입력해 회원가입 후 JWT 토큰 발급   |
+| **회원 탈퇴**           | DELETE      | `/api/v1/accounts/`                            | 회원 탈퇴 (소프트 삭제)                         |
+| **로그인**              | POST        | `/api/v1/accounts/login/`                      | 유저네임, 비밀번호로 로그인 후 JWT 토큰 발급     |
+| **로그아웃**             | POST        | `/api/v1/accounts/logout/`                    | 소프트 삭제로 is_active 계정 비활성화           |
+| **프로필 조회 및 수정**  | GET/POST     | `/api/v1/accounts/<str:username>/`           | 로그인한 사용자의 정보(북마크, 작성글 포함)를 조회|
+| **게시글 목록 조회**     | GET         | `/api/v1/articles/(free/ask/company)/`        | 자유, 질문, 홍보 게시글 목록 조회                |
+| **게시글 작성**         | POST        | `/api/v1/articles/`                            | 새로운 게시글 작성                              |
+| **게시글 수정**         | PUT         | `/api/v1/articles/<int:pk>/`                   | 기존 게시글 수정                                |
+| **게시글 삭제**         | DELETE      | `/api/v1/articles/<int:pk>/`                   | 게시글 삭제                                     |
+| **게시글 좋아요**        | POST        | `/api/v1/articles/<int:pk>/like/`             | 게시글에 좋아요 추가/취소                        |
+| **게시글 북마크**        | POST        | `/api/v1/articles/<int:pk>/bookmark/`         | 게시글을 북마크에 추가/제거                      |
+| **뉴스 목록 조회**       | GET         | `/api/v1/nbcns/`                              | 크롤링된 뉴스 목록을 조회                        |
+| **뉴스 생성**            | POST        | `/api/v1/nbcns/`                              | 새로운 뉴스 생성                                |
+| **뉴스 상세 조회**       | GET        | `/api/v1/nbcns/<int:pk>/`                      | 선택한 뉴스 조회                                |
+| **뉴스 삭제**          | DELETE       | `/api/v1/nbcns/<int:pk>/`                      | 선택한 뉴스 삭제                                |
+| **뉴스 북마크**         | POST        | `/api/v1/nbcns/<int:pk>/bookmark/`             | 뉴스 북마크 추가/취소                           |
+| **댓글 목록 조회**       | GET         | `/api/v1/articles/<int:pk>/comments/`         | 특정 게시글의 댓글 목록 조회                     |
+| **댓글 작성**           | POST        | `/api/v1/articles/<int:pk>/comments/`          | 특정 게시글에 댓글 작성                         |
+| **댓글 수정**           | PUT         | `/api/v1/comments/<int:pk>/`                   | 댓글 수정                                      |
+| **댓글 삭제**           | DELETE      | `/api/v1/comments/<int:pk>/`                   | 댓글 삭제 (소프트 삭제)                         |
 
 ---
 
