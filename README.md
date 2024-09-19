@@ -53,6 +53,12 @@ python manage.py runserver
 
 ---
 
+## 🖇️ 와이어 프레임
+
+
+
+---
+
 ## 📋 API 사용법
 
 자세한 API 명세서는 [Postman API Documentation](https://documenter.getpostman.com/view/37990286/2sAXqs6Miq)에서 확인할 수 있습니다.
