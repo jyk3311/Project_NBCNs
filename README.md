@@ -63,23 +63,22 @@ python manage.py runserver
 | **회원 탈퇴**           | DELETE      | `/api/accounts/`                            | 회원 탈퇴 (소프트 삭제)                       |
 | **로그인**              | POST        | `/api/accounts/login/`                      | 유저네임, 비밀번호로 로그인 후 JWT 토큰 발급    |
 | **로그아웃**             | POST        | `/api/accounts/logout/`                     | 소프트 삭제로 is_active 계정 비활성화       |
-| **프로필 조회 및 수정**  | GET/POST     | `/api/accounts/<str:username>/`             | 로그인한 사용자의 정보를 조회                 |
-| **내 북마크**           | GET          | `/api/accounts/<str:username>/`             | 로그인한 사용자의 북마크를 조회                 |
-| **내 작성글**            | GET         | `/api/accounts/<str:username>/`             | 로그인한 사용자의 작성글을 조회                 |
-| **뉴스 목록 조회**       | GET         | `/api/nbcns/`                               | 크롤링된 뉴스 목록을 조회                      |
-| **뉴스 생성** (관리자만) | POST        | `/api/nbcns/`                               | 새로운 뉴스 생성                              |
-| **뉴스 삭제** (관리자만) | DELETE      | `/api/nbcns/<pk>/`                          | 선택한 뉴스 삭제                              |
-| **뉴스 북마크**         | POST        | `/api/nbcns/<pk>/bookmark/`                 | 뉴스 북마크 추가/취소                         |
+| **프로필 조회 및 수정**  | GET/POST     | `/api/accounts/<str:username>/`             | 로그인한 사용자의 정보(북마크, 작성글 포함)를 조회 |
 | **게시글 목록 조회**     | GET         | `/api/articles/(free/ask/company)/`        | 자유, 질문, 홍보 게시글 목록 조회              |
 | **게시글 작성**         | POST        | `/api/articles/`                            | 새로운 게시글 작성                             |
-| **게시글 수정**         | PUT         | `/api/articles/<pk>/`                       | 기존 게시글 수정                               |
-| **게시글 삭제**         | DELETE      | `/api/articles/<pk>/`                       | 게시글 삭제                                    |
-| **게시글 좋아요**        | POST        | `/api/articles/<pk>/like/`               | 게시글에 좋아요 추가/취소                      |
-| **게시글 북마크**        | POST        | `/api/articles/<pk>/bookmark/`              | 게시글을 북마크에 추가/제거                     |
-| **댓글 목록 조회**       | GET         | `/api/articles/<pk>/comments/`              | 특정 게시글의 댓글 목록 조회                    |
-| **댓글 작성**           | POST        | `/api/articles/<pk>/comments/`              | 특정 게시글에 댓글 작성                         |
-| **댓글 수정**           | PUT         | `/api/comments/<pk>/`                       | 댓글 수정                                      |
-| **댓글 삭제**           | DELETE      | `/api/comments/<pk>/`                       | 댓글 삭제 (소프트 삭제)                         |
+| **게시글 수정**         | PUT         | `/api/articles/<int:pk>/`                       | 기존 게시글 수정                               |
+| **게시글 삭제**         | DELETE      | `/api/articles/<int:pk>/`                       | 게시글 삭제                                    |
+| **게시글 좋아요**        | POST        | `/api/articles/<int:pk>/like/`               | 게시글에 좋아요 추가/취소                      |
+| **게시글 북마크**        | POST        | `/api/articles/<int:pk>/bookmark/`              | 게시글을 북마크에 추가/제거                     |
+| **뉴스 목록 조회**       | GET         | `/api/nbcns/`                               | 크롤링된 뉴스 목록을 조회                      |
+| **뉴스 생성**            | POST        | `/api/nbcns/`                               | 새로운 뉴스 생성                              |
+| **뉴스 상세 조회**       | GET        | `/api/nbcns/<int:pk>/`                          | 선택한 뉴스 조회                              |
+| **뉴스 삭제**          | DELETE       | `/api/nbcns/<int:pk>/`                          | 선택한 뉴스 삭제                              |
+| **뉴스 북마크**         | POST        | `/api/nbcns/<int:pk>/bookmark/`                 | 뉴스 북마크 추가/취소                         |
+| **댓글 목록 조회**       | GET         | `/api/articles/<int:pk>/comments/`              | 특정 게시글의 댓글 목록 조회                    |
+| **댓글 작성**           | POST        | `/api/articles/<int:pk>/comments/`              | 특정 게시글에 댓글 작성                         |
+| **댓글 수정**           | PUT         | `/api/comments/<int:pk>/`                       | 댓글 수정                                      |
+| **댓글 삭제**           | DELETE      | `/api/comments/<int:pk>/`                       | 댓글 삭제 (소프트 삭제)                         |
 
 ---
 
@@ -90,8 +89,6 @@ python manage.py runserver
 ![image (4)](https://github.com/user-attachments/assets/fb7fac6c-7069-4e67-a640-f62449ea8c3b)
 
 ### ERD 설명
-
-NBCN 프로젝트의 데이터 모델 간 관계를 이해하기 위해 **ERD**를 사용합니다. ERD는 각 모델 간의 관계를 시각적으로 보여줍니다. 아래는 주요 모델 관계입니다.
 
 - **User 모델**: 사용자는 게시글을 작성하고, 댓글을 남길 수 있으며, 좋아요 기능을 이용할 수 있고, 뉴스 및 게시글을 북마크할 수 있습니다.
 - **Article 모델**: 게시글은 자유, 질문, 홍보 게시판으로 분류되며, 댓글 및 좋아요 기능을 제공합니다.
