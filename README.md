@@ -8,7 +8,7 @@ NBCN(Newbie Coding News)은 IT 산업의 초보자들을 위한 **뉴스 및 커
 
 - **회원가입 및 로그인**: JWT 기반 인증 시스템을 사용하여 사용자 관리.
 - **프로필 관리**: 회원 프로필 조회 및 수정.
-- **NBCN 뉴스**: AI가 크롤링된 뉴스를 요약하여 제공하며, 북마크 기능으로 뉴스를 저장할 수 있습니다.
+- **NBCN 뉴스**: AI가 크롤링된 뉴스를 요약하여 제공하며, 북마크 기능으로 뉴스를 저장.
 - **게시판 시스템**: 자유, 질문, 홍보 게시판 제공 및 좋아요/북마크 기능.
 - **댓글 및 좋아요**: 게시글에 대한 댓글 작성 및 좋아요 기능.
 - **사용자 역할 관리**: 관리자, 마스터, 일반 사용자(뉴비)로 역할에 따른 권한 부여.
@@ -59,11 +59,13 @@ python manage.py runserver
 
 | 기능                    | HTTP 메서드 | 엔드포인트                                   | 설명                                      |
 |-------------------------|-------------|---------------------------------------------|-------------------------------------------|
-| **회원가입**            | POST        | `/api/accounts/signup/`                     | 사용자 정보를 입력해 회원가입 후 JWT 토큰 발급  |
-| **로그인**              | POST        | `/api/accounts/login/`                      | 이메일, 비밀번호로 로그인 후 JWT 토큰 발급    |
-| **프로필 조회**         | GET         | `/api/accounts/profile/`                    | 로그인한 사용자의 정보를 조회                 |
-| **프로필 수정**         | PUT         | `/api/accounts/profile/update/`             | 사용자 프로필 정보를 수정                    |
+| **회원가입**            | POST        | `/api/accounts/`                            | 사용자 정보를 입력해 회원가입 후 JWT 토큰 발급  |
 | **회원 탈퇴**           | DELETE      | `/api/accounts/`                            | 회원 탈퇴 (소프트 삭제)                       |
+| **로그인**              | POST        | `/api/accounts/login/`                      | 유저네임, 비밀번호로 로그인 후 JWT 토큰 발급    |
+| **로그아웃**             | POST        | `/api/accounts/logout/`                     | 소프트 삭제로 is_active 계정 비활성화       |
+| **프로필 조회 및 수정**  | GET/POST     | `/api/accounts/<str:username>/`             | 로그인한 사용자의 정보를 조회                 |
+| **내 북마크**           | GET          | `/api/accounts/<str:username>/`             | 로그인한 사용자의 북마크를 조회                 |
+| **내 작성글**            | GET         | `/api/accounts/<str:username>/`             | 로그인한 사용자의 작성글을 조회                 |
 | **뉴스 목록 조회**       | GET         | `/api/nbcns/`                               | 크롤링된 뉴스 목록을 조회                      |
 | **뉴스 생성** (관리자만) | POST        | `/api/nbcns/`                               | 새로운 뉴스 생성                              |
 | **뉴스 삭제** (관리자만) | DELETE      | `/api/nbcns/<pk>/`                          | 선택한 뉴스 삭제                              |
@@ -72,7 +74,7 @@ python manage.py runserver
 | **게시글 작성**         | POST        | `/api/articles/`                            | 새로운 게시글 작성                             |
 | **게시글 수정**         | PUT         | `/api/articles/<pk>/`                       | 기존 게시글 수정                               |
 | **게시글 삭제**         | DELETE      | `/api/articles/<pk>/`                       | 게시글 삭제                                    |
-| **좋아요**              | POST        | `/api/articles/<pk>/like/`                  | 게시글에 좋아요 추가/취소                      |
+| **게시글 좋아요**        | POST        | `/api/articles/<pk>/like/`               | 게시글에 좋아요 추가/취소                      |
 | **게시글 북마크**        | POST        | `/api/articles/<pk>/bookmark/`              | 게시글을 북마크에 추가/제거                     |
 | **댓글 목록 조회**       | GET         | `/api/articles/<pk>/comments/`              | 특정 게시글의 댓글 목록 조회                    |
 | **댓글 작성**           | POST        | `/api/articles/<pk>/comments/`              | 특정 게시글에 댓글 작성                         |
